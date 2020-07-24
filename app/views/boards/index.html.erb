@@ -1,3 +1,4 @@
+
 <h1>看板</h1>
 
 <%= link_to '新增看板', new_board_path %>
@@ -5,7 +6,9 @@
 <ul>
   <% @boards.each do |board| %>
     <li>
-      <%= board.title %>
+      <%= link_to board.title, board_path(board.id) %>
+      <%= link_to '編輯', edit_board_path(board.id) %>
+      <%= link_to '刪除', board_path(board.id), method: 'delete', data: {confirm: 'are you sure?'} %>
     </li>
   <% end %>
 </ul>
