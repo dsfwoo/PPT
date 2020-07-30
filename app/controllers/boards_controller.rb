@@ -1,6 +1,10 @@
 class BoardsController < ApplicationController
+
+  before_action :find_board, only: [:show, :edit, :destroy, :update]
+
   def index
-    @boards = Board.all #如果不加區域變數的話，查完之後結果就會被蒸發沒辦法被取用
+    # @boards = Board.where(deleted_at: nil) #如果不加區域變數的話，查完之後結果就會被蒸發沒辦法被取用，因為下面的update方法是使用軟刪除的方式，所以不能使用all方法要使用where去篩選deleted_at欄位是空的
+    @boards = Board.all
   end
 
   def new
@@ -8,11 +12,9 @@ class BoardsController < ApplicationController
   end
 
   def show
-    @board = Board.find(params[:id])
   end
 
   def edit
-    @board = Board.find(params[:id])
   end
 
   #where找出來的東西都會用陣列包起來，要取用裡面的值需要在下.first比find方法多麻煩一點，取出的形式為 [1]
@@ -31,8 +33,6 @@ class BoardsController < ApplicationController
   end
 
   def update
-    @board = Board.find(params[:id])
-    
     if @board.update(board_params)
       redirect_to boards_path, notice: 'Board Updated !'
     else
@@ -41,14 +41,20 @@ class BoardsController < ApplicationController
   end
 
   def destroy
-    @board = Board.find(params[:id])
     @board.destroy
+    # @board.update(deleted_at: Time.now, abc: false)
     redirect_to boards_path, notice: 'Board Deleted !'
   end
+
+  
 
   private
 #清洗資料的方法
   def board_params
     params.require(:board).permit(:title, :intro) #寫入資料庫的資料需要清過清洗確保不會被上一個頁面的有心人士塞入奇怪的資料
+  end
+
+  def find_board
+    @board = Board.find(params[:id])
   end
 end
